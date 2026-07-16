@@ -1,0 +1,21 @@
+# Build artifacts
+Debug/
+*.o
+*.out
+*.map
+*.xml
+*.lst
+
+# IDE
+.vscode/
+.idea/
+.settings/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# OS
+*.bak
+*.tmp
