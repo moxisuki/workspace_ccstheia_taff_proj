@@ -4,7 +4,7 @@
 namespace task::heading {
 
 void init();
-void step(const sensors::state::State& s);
+void loop(const sensors::state::State& s, float dt);
 float last_turn();
 
 }

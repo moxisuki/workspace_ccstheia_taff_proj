@@ -4,6 +4,6 @@
 namespace task::debug {
 
 void init();
-void print(const sensors::state::State& s);
+void loop(const sensors::state::State& s);
 
 }
