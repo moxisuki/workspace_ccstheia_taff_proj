@@ -5,7 +5,7 @@
 namespace sensors::state {
 
 namespace {
-drivers::Lpf gz_lpf(0.15f);
+drivers::Lpf gz_lpf(0.3f);
 }
 
 void init() {

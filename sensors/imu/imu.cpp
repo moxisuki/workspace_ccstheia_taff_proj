@@ -63,12 +63,12 @@ void parse_frame() {
 }
 
 void service_byte(uint8_t b) {
-    g_sum = static_cast<uint8_t>(g_sum + b);
     switch (g_state) {
         case State::Head1:
             if (b == kHead1) { g_sum = kHead1; g_state = State::Head2; }
             break;
         case State::Head2:
+            g_sum = static_cast<uint8_t>(g_sum + b);
             if ((b & 0xF0) == 0x50) {
                 g_type = b;
                 g_idx  = 0;
@@ -80,6 +80,7 @@ void service_byte(uint8_t b) {
             }
             break;
         case State::Data:
+            g_sum = static_cast<uint8_t>(g_sum + b);
             g_buf[g_idx++] = b;
             if (g_idx == kDataLen) g_state = State::Sum;
             break;

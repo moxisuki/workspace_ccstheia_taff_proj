@@ -1,23 +1,25 @@
 #include "task/debug_task.h"
 
-#include <stdio.h>
-
-#include "drivers/systick/systick.h"
+#include "common/print.h"
 #include "control/heading/heading.h"
 #include "task/heading_task.h"
 
 namespace task::debug {
 
 void init() {
-    printf("\r\n[boot] taff_proj v2 (debug)\r\n");
+    common::uart_print("[boot] taff_proj\r\n");
 }
 
 void loop(const sensors::state::State& s) {
-    printf("y=%6.1f yr=%5.1f gz_raw=%5.1f err=%5.1f turn=%6.1f t=%u\r\n",
-           s.yaw, s.yaw_rate, s.gx_raw,
-           control::heading::last_error(),
-           task::heading::last_turn(),
-           drivers::systick::now_ms());
+    // Cube: roll, pitch, yaw
+    common::uart_print_f1(s.roll);  common::uart_print(",");
+    common::uart_print_f1(s.pitch); common::uart_print(",");
+    common::uart_print_f1(s.yaw);   common::uart_print(",");
+    // 控制: yr, err, turn
+    common::uart_print_f1(s.yaw_rate); common::uart_print(",");
+    common::uart_print_f1(control::heading::last_error()); common::uart_print(",");
+    common::uart_print_f1(task::heading::last_turn());
+    common::uart_println();
 }
 
 }  // namespace task::debug

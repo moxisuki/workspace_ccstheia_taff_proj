@@ -5,7 +5,7 @@
 namespace control::heading {
 
 namespace {
-Pid    g_pid(2.0f, 0.0f, 0.05f, 50.0f);  // PD: P=2.0, D=0.05
+Pid    g_pid(2.0f, 0.05f, 0.05f, 30.0f);  // P=2 I=0.05 D=0.05, 走直线加小 I 消稳态误差
 float  g_target = 0;
 float  g_last_err = 0;
 }
