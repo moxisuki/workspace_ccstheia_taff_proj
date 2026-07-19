@@ -1,6 +1,6 @@
 #pragma once
 
-namespace drivers {
+namespace common {
 
 class Lpf {
 public:

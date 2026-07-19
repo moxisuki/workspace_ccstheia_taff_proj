@@ -1,15 +1,17 @@
 #include "sensors/state/state.h"
 #include "sensors/imu/imu.h"
-#include "drivers/lpf/lpf.h"
+#include "sensors/motor_speed.h"
+#include "common/lpf/lpf.h"
 
 namespace sensors::state {
 
 namespace {
-drivers::Lpf gz_lpf(0.3f);
+common::Lpf gz_lpf(0.3f);
 }
 
 void init() {
     gz_lpf.reset();
+    sensors::motor_speed::init();
 }
 
 State read() {
@@ -26,6 +28,9 @@ State read() {
         s.valid = imu.valid;
         s.fresh = imu.fresh;
     }
+    auto spd = sensors::motor_speed::read();
+    s.m1 = spd.m1; s.m2 = spd.m2;
+    s.m3 = spd.m3; s.m4 = spd.m4;
     return s;
 }
 

@@ -5,8 +5,7 @@
 #include "sensors/imu/imu.h"
 #include "sensors/state/state.h"
 #include "common/rate.h"
-#include "control/heading/heading.h"
-#include "task/heading_task.h"
+#include "task/drive_task.h"
 #include "task/debug_task.h"
 
 namespace {
@@ -22,8 +21,7 @@ int main(void) {
     drivers::uart::init();
     sensors::imu::init();
     sensors::state::init();
-    control::heading::init();
-    task::heading::init();
+    task::drive::init();
     task::debug::init();
 
     uint32_t now = drivers::systick::now_ms();
@@ -35,9 +33,7 @@ int main(void) {
         auto s = sensors::state::read();
 
         if (float dt = gate_100hz.tick(now); dt > 0) {
-            task::heading::loop(s, dt);
-            // 以后同频率的 task 加这里:
-            // task::motor::loop(s, dt);
+            task::drive::loop(s, dt);
         }
 
         if (gate_20hz.tick(now) > 0) {
