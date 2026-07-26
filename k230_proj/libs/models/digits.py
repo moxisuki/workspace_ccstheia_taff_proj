@@ -43,9 +43,7 @@ def make():
     return ModelSpec(
         name         = "digits",
         kmodel_candidates = [
-            "/sdcard/models/yolo11n_digits_320.kmodel",  # 新标准 (9322 重命名)
-            "/sdcard/models/yolo11n_det_320.kmodel",     # 别名 (9322 原始名)
-            "/sdcard/yolo11n_det_320.kmodel",            # 9322 demo 默认
+            "/sdcard/models/digits/yolo11n_digits_320.kmodel",
         ],
         labels      = DIGIT_LABELS,
         input_size  = INPUT_SIZE,

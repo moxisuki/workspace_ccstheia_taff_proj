@@ -1,0 +1,3 @@
+# Model binaries (large, from 01Studio training platform)
+*.kmodel
+assets/models/

@@ -1,4 +1,4 @@
-# K230 vision + digits detect — hardware-tested configuration
+# K230 vision detection — balls (9340) / digits (9322)
 
 import os, gc, utime, image
 from media.sensor import *
@@ -8,6 +8,8 @@ from media.media import *
 from libs.uart_proto import UARTProto
 from libs.detect import Detector
 from libs.osd import OSD
+from libs.models.balls import make as make_balls
+from libs.models.digits import make as make_digits
 
 # ---------- hardware-tested config ----------
 DISPLAY_WIDTH  = ALIGN_UP(640, 16)
@@ -19,21 +21,8 @@ LOG_TAG = "[k230]"
 def log(msg):
     print("{} {:>8} ms | {}".format(LOG_TAG, utime.ticks_ms(), msg))
 
-# ---------- digits model ----------
-def digits_model():
-    from libs.detect import ModelSpec
-    from libs.models.digits import DIGIT_LABELS, _digit_renderer
-    return ModelSpec(
-        name="digits",
-        kmodel_candidates=[
-            "/sdcard/models/yolo11n_digits_320.kmodel",
-            "/sdcard/models/yolo11n_det_320.kmodel",
-            "/sdcard/yolo11n_det_320.kmodel",
-        ],
-        labels=DIGIT_LABELS, yolo_version="v11",
-        conf_thresh=0.6, nms_thresh=0.45,
-        renderer=_digit_renderer,
-    )
+# ---------- model presets ----------
+ACTIVE_MODEL = "balls"  # "balls" | "digits"
 
 # ---------- main ----------
 def main():
@@ -51,7 +40,7 @@ def main():
     # CHN0: 640x480 YUV420 → bind_layer 自动推显示
     sensor.set_framesize(width=DISPLAY_WIDTH, height=DISPLAY_HEIGHT)
     sensor.set_pixformat(PIXEL_FORMAT_YUV_SEMIPLANAR_420)
-    # CHN2: 1280x720 RGB888 → AI (必须 RGB888, YOLO to_numpy_ref 只认这个)
+    # CHN2: 640x360 RGB888P → AI (必须 RGB888, YOLO to_numpy_ref 只认这个)
     sensor.set_framesize(width=AI_WIDTH, height=AI_HEIGHT, chn=CAM_CHN_ID_2)
     sensor.set_pixformat(PIXEL_FORMAT_RGB_888_PLANAR, chn=CAM_CHN_ID_2)
 
@@ -66,10 +55,11 @@ def main():
     # --- detector ---
     detector = Detector(rgb888p_size=(AI_WIDTH, AI_HEIGHT),
                         display_size=(DISPLAY_WIDTH, DISPLAY_HEIGHT))
-    detector.register(digits_model())
+    detector.register(make_balls())
+    detector.register(make_digits())
     detector.setup_yolo(proto)
-    detector.switch("digits")
-    log("model: digits")
+    detector.switch(ACTIVE_MODEL)
+    log("model: " + ACTIVE_MODEL)
 
     # --- MediaManager + sensor.run ---
     MediaManager.init()
