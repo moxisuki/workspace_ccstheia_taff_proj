@@ -18,9 +18,13 @@ int main(void) {
     SYSCFG_DL_init();
     drivers::systick::init();
     drivers::uart::init();
+    common::uart_print("[boot] taff_proj\r\n");
     sensors::imu::init();
+    common::uart_print("[boot] imu ok\r\n");
     sensors::state::init();
+    common::uart_print("[boot] state ok\r\n");
     sensors::k230::init();
+    common::uart_print("[boot] k230 ok\r\n");
     task::drive::init();
     task::debug::init();
 

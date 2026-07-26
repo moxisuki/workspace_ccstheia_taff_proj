@@ -78,6 +78,7 @@ UART3.rxPinConfig.passedPeripheralType = scripting.forceWrite("Digital");
 UART4.$name                            = "K230_UART";
 UART4.targetBaudRate                   = 115200;
 UART4.enableFIFO                       = true;
+UART4.enabledInterrupts                = ["RX"];
 UART4.peripheral.$assign               = "UART3";
 UART4.peripheral.rxPin.$assign         = "PB3";
 UART4.peripheral.txPin.$assign         = "PB2";

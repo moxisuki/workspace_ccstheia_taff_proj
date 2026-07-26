@@ -7,7 +7,7 @@ namespace {
 #define KV_INT(k,v) do{common::uart_print(k"=");common::uart_print_int(v);common::uart_print(",");}while(0)
 #define KV_F1(k,v)  do{common::uart_print(k"=");common::uart_print_f1(v);common::uart_print(",");}while(0)
 }
-void init() { common::uart_print("[boot] taff_proj\r\n"); }
+void init() {}
 void loop(const sensors::state::State& s) {
     KV_F1("roll",s.roll); KV_F1("pitch",s.pitch); KV_F1("yaw",s.yaw);
     KV_F1("yaw_rate",s.yaw_rate); KV_F1("hd_err",control::heading::last_error());
