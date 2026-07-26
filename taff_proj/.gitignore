@@ -16,6 +16,13 @@ Debug/
 .DS_Store
 Thumbs.db
 
+# SysConfig generated
+device_linker.cmd
+device.opt
+device.cmd.genlibs
+ti_msp_dl_config.c
+ti_msp_dl_config.h
+
 # OS
 *.bak
 *.tmp

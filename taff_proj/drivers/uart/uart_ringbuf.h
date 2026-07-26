@@ -12,6 +12,7 @@ public:
     size_t pop(uint8_t* dst, size_t max);
     size_t available() const { return (head_ - tail_) % kSize; }
     void flush() { head_ = tail_ = 0; }
+    size_t peek_recent(uint8_t* dst, size_t max) const;
 
 private:
     volatile uint8_t  buf_[kSize];

@@ -18,5 +18,11 @@ size_t RingBuf::pop(uint8_t* dst, size_t max) {
     }
     return n;
 }
+size_t RingBuf::peek_recent(uint8_t* dst, size_t max) const {
+    size_t avail = available();
+    if (max > avail) max = avail;
+    for (size_t i = 0; i < max; ++i) dst[i] = buf_[(tail_ + i) % kSize];
+    return max;
+}
 
 }
