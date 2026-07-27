@@ -10,7 +10,9 @@ public:
 
     void push(uint8_t b);
     size_t pop(uint8_t* dst, size_t max);
-    size_t available() const { return (head_ - tail_) % kSize; }
+    size_t available() const {
+        return static_cast<size_t>((head_ + kSize - tail_) % kSize);
+    }
     void flush() { head_ = tail_ = 0; }
     size_t peek_recent(uint8_t* dst, size_t max) const;
 

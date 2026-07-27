@@ -26,3 +26,7 @@ ti_msp_dl_config.h
 # OS
 *.bak
 *.tmp
+
+# Python tools
+__pycache__/
+*.pyc

@@ -3,7 +3,7 @@
 #include <stddef.h>
 
 namespace sensors::motor_speed {
-struct Data { int16_t m1, m2, m3, m4; bool fresh; };
+struct Data { int16_t m1, m2, m3, m4; bool fresh; };  // ×10 rpm
 void init();
 Data read();
 void on_rx_byte(uint8_t b);

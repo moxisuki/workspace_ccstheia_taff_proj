@@ -14,6 +14,12 @@ void uart_print(const char* s) {
     }
 }
 
+static const char kHex[] = "0123456789ABCDEF";
+void uart_print_hex8(uint8_t val) {
+    write_char(kHex[val >> 4]);
+    write_char(kHex[val & 0x0F]);
+}
+
 void uart_println() {
     write_char('\r');
     write_char('\n');

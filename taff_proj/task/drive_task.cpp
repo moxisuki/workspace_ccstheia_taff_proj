@@ -1,57 +1,72 @@
-// 行车演示: 直行 2s → 弧线右转 90° → 直行 2s → 停车
-// 调用 task::drive::cmd_demo() 启动
-
 #include "task/drive_task.h"
 
+#include "app/global_mode.h"
 #include "control/drive/drive.h"
 #include "drivers/motor/motor.h"
 #include "drivers/systick/systick.h"
+#include "sensors/ccd/ccd.h"
 
 namespace task::drive {
 
 namespace {
-enum { D_IDLE, D_GO, D_WAIT_TURN, D_TURN_DONE, D_STOP } g_step;
-uint32_t g_t0;
+bool g_synced = false;
+app::global_mode::Mode g_last_mode = app::global_mode::Mode::Stop;
+
+void enter_mode(app::global_mode::Mode mode) {
+    switch (mode) {
+    case app::global_mode::Mode::Stop:
+        control::drive::enter_stop();
+        break;
+    case app::global_mode::Mode::LineTrace:
+        control::drive::enter_line_trace();
+        break;
+    case app::global_mode::Mode::Straight:
+        control::drive::enter_straight();
+        break;
+    case app::global_mode::Mode::UTurn:
+        control::drive::enter_uturn(180.0f);
+        break;
+    }
+
+    g_last_mode = mode;
+    g_synced = true;
+}
+
+const uint8_t* ccd_pixels_for(app::global_mode::Mode mode) {
+    if (mode == app::global_mode::Mode::LineTrace) {
+        return sensors::ccd::scan();
+    }
+    return sensors::ccd::data();
+}
+
 }  // namespace
 
 void init() {
-    drivers::motor::init();
-    control::drive::init();
+    g_synced = false;
+    enter_mode(app::global_mode::mode());
 }
-
-void cmd_demo() { g_step = D_GO; }
 
 void loop(const sensors::state::State& s, float dt) {
     uint32_t now = drivers::systick::now_ms();
-    switch (g_step) {
-    case D_GO:
-        control::drive::cmd_go(300);
-        g_t0   = now;
-        g_step = D_WAIT_TURN;
-        break;
-    case D_WAIT_TURN:
-        if (now - g_t0 > 2000) {
-            control::drive::cmd_turn(90, 150);
-            g_step = D_TURN_DONE;
-        }
-        break;
-    case D_TURN_DONE:
-        if (!control::drive::turning()) {
-            control::drive::cmd_go(300);
-            g_t0   = now;
-            g_step = D_STOP;
-        }
-        break;
-    case D_STOP:
-        if (now - g_t0 > 2000) {
-            control::drive::cmd_stop();
-            g_step = D_IDLE;
-        }
-        break;
-    default: break;
+    app::global_mode::Mode app_mode = app::global_mode::mode();
+
+    if (!g_synced || app_mode != g_last_mode) {
+        enter_mode(app_mode);
     }
-    auto out = control::drive::step(s, dt);
-    drivers::motor::set_diff(out.base, out.turn);
+
+    const uint8_t* pixels = ccd_pixels_for(app_mode);
+    control::drive::Output out = control::drive::step(s, pixels, dt);
+    drivers::motor::set_ackermann(out.base, out.steer);
+
+    if (app_mode == app::global_mode::Mode::UTurn && control::drive::uturn_done()) {
+        app::global_mode::change_mode(app::global_mode::Mode::LineTrace, now);
+    }
+}
+
+void cmd_demo() {
+    app::global_mode::change_mode(
+        app::global_mode::Mode::LineTrace,
+        drivers::systick::now_ms());
 }
 
 }  // namespace task::drive

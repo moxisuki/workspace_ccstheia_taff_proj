@@ -1,4 +1,5 @@
 #include "drivers/uart/uart.h"
+#include "drivers/uart/uart_ringbuf.h"
 #include "ti_msp_dl_config.h"
 
 namespace drivers::uart {
@@ -10,6 +11,8 @@ static UART_Regs* const kInst[] = {
     K230_UART_INST,
 };
 
+RingBuf g_debug_tx;
+
 void init() {}
 
 size_t write(Id id, const void* data, size_t len) {
@@ -20,6 +23,31 @@ size_t write(Id id, const void* data, size_t len) {
         DL_UART_Main_transmitData(h, p[i]);
     }
     return len;
+}
+
+size_t write_async(Id id, const void* data, size_t len) {
+    if (id != Id::Debug) {
+        return write(id, data, len);
+    }
+
+    const uint8_t* p = static_cast<const uint8_t*>(data);
+    size_t written = 0;
+    for (; written < len; ++written) {
+        size_t before = g_debug_tx.available();
+        g_debug_tx.push(p[written]);
+        if (g_debug_tx.available() == before) break;
+    }
+    service_tx();
+    return written;
+}
+
+void service_tx() {
+    auto* h = DEBUG_UART_INST;
+    uint8_t b;
+    while (!DL_UART_Main_isTXFIFOFull(h)) {
+        if (g_debug_tx.pop(&b, 1) != 1) break;
+        DL_UART_Main_transmitData(h, b);
+    }
 }
 
 size_t read(Id id, void* buf, size_t len) {

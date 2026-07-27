@@ -9,6 +9,10 @@ public:
 
     float step(float err, float dt);
     void reset();
+    void set_gains(float kp, float ki, float kd);
+    float kp() const { return kp_; }
+    float ki() const { return ki_; }
+    float kd() const { return kd_; }
 
 private:
     float kp_, ki_, kd_;
@@ -17,4 +21,4 @@ private:
     float last_err_ = 0;
 };
 
-}
+}  // namespace control

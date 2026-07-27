@@ -1,4 +1,5 @@
 #include "control/pid/pid.h"
+
 #include "common/math.h"
 
 namespace control {
@@ -17,4 +18,11 @@ void Pid::reset() {
     last_err_ = 0;
 }
 
+void Pid::set_gains(float kp, float ki, float kd) {
+    kp_ = kp;
+    ki_ = ki;
+    kd_ = kd;
+    reset();
 }
+
+}  // namespace control

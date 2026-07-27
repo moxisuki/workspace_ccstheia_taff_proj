@@ -14,6 +14,8 @@ enum class Id : uint8_t {
 void init();
 
 size_t write(Id id, const void* data, size_t len);
+size_t write_async(Id id, const void* data, size_t len);
+void   service_tx();
 size_t read(Id id, void* buf, size_t len);
 bool   readable(Id id);
 
